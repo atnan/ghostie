@@ -1,0 +1,38 @@
+Ghostie is a handy helper for adding "ghost" text to HTML text input fields. It
+relies on the Prototype library, so you'll need that too.
+
+Ghostie looks for all <input /> fields of type "text" or "password" (IE not
+supported at the moment) with a CSS class of "ghostie". For each input it finds,
+it takes the text defined in the "title" attribute and copies it into the
+"value" attribute. When the user clicks the field and the value is identical to
+the ghostie text, the value is cleared. Likewise, when a submit button in the
+same form as the ghostie field is clicked, it clears the values if they haven't
+been changed by the user.
+
+The usage is very simple:
+
+  <html>
+    <head>
+      <script src="prototype.js" type="text/javascript"></script>
+      <script src="ghostie.js" type="text/javascript"></script>
+      <style type="text/css">
+        input.ghostie {
+          // Styles to be applied to all ghostie fields
+        }
+
+        input.ghostied {
+          // Styles to be applied to all ghostie fields which haven't been
+          // clicked or typed into. You would typically want to set the ghostie
+          // font to a lighter colour.
+        }
+      </style>
+    </head>
+    <body>
+      <form>
+        <input type="text" class="ghostie" title="Boo!" />
+        <input type="submit" class="submit" value="Submit" />
+      </form>
+    </body>
+  </html>
+
+Copyright (c) 2008 Nathan de Vries <nathan@atnan.com>
