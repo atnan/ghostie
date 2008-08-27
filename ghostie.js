@@ -20,7 +20,7 @@
   THE SOFTWARE.
 */
 
-Event.observe(document, 'dom:loaded', function() {
+document.observe('dom:loaded', function() {
   $$('input.ghostie').each(function(ghost, index) {
 
     if ((ghost.type != 'text') && (ghost.type != 'password')) { return; }
@@ -38,7 +38,7 @@ Event.observe(document, 'dom:loaded', function() {
       ghost.addClassName('ghostied');
     }
 
-    Event.observe(ghost, 'focus', function() {
+    ghost.observe('focus', function() {
       if (this.hasClassName('password')) {
         this.type = 'password';
       }
@@ -49,7 +49,7 @@ Event.observe(document, 'dom:loaded', function() {
       }
     });
 
-    Event.observe(ghost, 'blur', function() {
+    ghost.observe('blur', function() {
       if (!this.value.length) {
         if (ghost.type == 'password') {
           ghost.type = 'text';
@@ -61,7 +61,7 @@ Event.observe(document, 'dom:loaded', function() {
     });
 
     ghost.up('form').select('input.submit').each(function(submit, index) {
-      Event.observe(submit, 'click', function() {
+      submit.observe('click', function() {
         if (ghost.value == ghost.title)
           ghost.value = '';
           submit.up('form').submit();
@@ -70,3 +70,4 @@ Event.observe(document, 'dom:loaded', function() {
 
   });
 });
+
