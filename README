@@ -30,9 +30,11 @@ The usage is very simple:
     <body>
       <form>
         <input type="text" class="ghostie" title="Boo!" />
-        <input type="submit" class="submit" value="Submit" />
+        <input type="submit" value="Submit" />
       </form>
     </body>
   </html>
+  
+See test.html for a working example.  
 
 Copyright (c) 2008 Nathan de Vries (http://www.atnan.com)
