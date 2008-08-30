@@ -20,54 +20,72 @@
   THE SOFTWARE.
 */
 
-document.observe('dom:loaded', function() {
-  $$('input.ghostie').each(function(ghost, index) {
+var Ghostie = Class.create({
+  initialize: function() {
+    // Mix in ghost(), unghost(), ghostable() etc.
+    Element.addMethods(this.methods);
+    
+    this.ghosts().each(function(ghost) {
+      // Set us up the Ghost
+      ghost.ghost();
 
-    if ((ghost.type != 'text') && (ghost.type != 'password')) { return; }
+      ghost.observe('focus', function() { ghost.unghost(); });
+      ghost.observe('blur', function() { ghost.ghost(); });
 
-    // We can support IE by using clone/remove/add, but until then password inputs
-    // won't be ghostied.
-    if ((ghost.type == 'password') && (Prototype.Browser.IE)) { return; }
-
-    if (((ghost.value == '') && (ghost.title != '')) || (ghost.value == ghost.title)) {
-      if (ghost.type == 'password') {
-        ghost.type = 'text';
-        ghost.addClassName('password');
-      }
-      ghost.value = ghost.title;
-      ghost.addClassName('ghostied');
-    }
-
-    ghost.observe('focus', function() {
-      if (this.hasClassName('password')) {
-        this.type = 'password';
-      }
-      if (this.value == this.title) {
-        this.value = '';
-        this.select();
-        ghost.removeClassName('ghostied');
-      }
-    });
-
-    ghost.observe('blur', function() {
-      if (!this.value.length) {
-        if (ghost.type == 'password') {
-          ghost.type = 'text';
-          ghost.addClassName('password');
-        }
-        this.value = this.title;
-        ghost.addClassName('ghostied');
-      }
-    });
-
-    ghost.up('form').select('input.submit').each(function(submit, index) {
-      submit.observe('click', function() {
-        if (ghost.value == ghost.title)
-          ghost.value = '';
-          submit.up('form').submit();
+      // Ensure that Ghosted values don't get submitted
+      ghost.up('form').select('input[type=submit]').each(function(submit) {
+        submit.observe('click', function() {
+          if (ghost.should_be_unghosted()) {
+            // Not sure why calling ghost.unghost() here doesn't work :(
+            ghost.value = '';
+          }
+        });
       });
     });
-
-  });
+  },
+  ghosts: function() {
+    return $$('input[title != ""].ghostie').select(function(ghost) {
+      return ghost.ghostable();
+    });
+  },
+  methods: {
+    ghostable: function(element) {
+      // We can support IE by using clone/remove/add, but until then password 
+      // inputs won't be ghostied.
+      return (element.tagName.toLowerCase() == 'input' &&
+          ((element.type == 'text') || (element.type == 'password') && 
+          (!Prototype.Browser.IE)))
+    },
+    should_be_ghosted: function(element) {
+      return (element.ghostable && element.value == '');
+    },
+    should_be_unghosted: function(element) {
+      return (element.ghostable && element.value == element.title);
+    },
+    ghost: function(element) {
+      if (element.should_be_ghosted()) {
+        if (element.type == 'password') { 
+          element.addClassName('password');
+          element.type = 'text'; 
+        }
+        element.value = element.title;
+        element.addClassName('ghostied');
+      }
+      return $(element);
+    },
+    unghost: function(element) {
+      if (element.should_be_unghosted()) {
+        if (element.hasClassName('password')) { element.type = 'password' }
+        element.value = '';
+        element.removeClassName('ghostied');
+      }
+      return $(element);
+    }
+  }
 });
 
+document.observe('dom:loaded', function(event) {
+  // Perhaps I should initialize Ghostie with event.element(), and allow some
+  // degree of configuration? 
+  new Ghostie();
+});
