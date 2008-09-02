@@ -35,8 +35,7 @@ var Ghostie = Class.create({
       // Ensure that Ghosted values don't get submitted
       ghost.up('form').observe('submit', function() {
         if (ghost.should_be_unghosted()) {
-          // Not sure why calling ghost.unghost() here doesn't work :(
-          ghost.value = '';
+          ghost.unghost();
         }
       });
     });
