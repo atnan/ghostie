@@ -24,7 +24,7 @@ var Ghostie = Class.create({
   initialize: function() {
     // Mix in ghost(), unghost(), ghostable() etc.
     Element.addMethods(this.methods);
-    
+
     this.ghosts().each(function(ghost) {
       // Set us up the Ghost
       ghost.ghost();
@@ -33,13 +33,11 @@ var Ghostie = Class.create({
       ghost.observe('blur', function() { ghost.ghost(); });
 
       // Ensure that Ghosted values don't get submitted
-      ghost.up('form').select('input[type=submit]').each(function(submit) {
-        submit.observe('click', function() {
-          if (ghost.should_be_unghosted()) {
-            // Not sure why calling ghost.unghost() here doesn't work :(
-            ghost.value = '';
-          }
-        });
+      ghost.up('form').observe('submit', function() {
+        if (ghost.should_be_unghosted()) {
+          // Not sure why calling ghost.unghost() here doesn't work :(
+          ghost.value = '';
+        }
       });
     });
   },
@@ -50,10 +48,10 @@ var Ghostie = Class.create({
   },
   methods: {
     ghostable: function(element) {
-      // We can support IE by using clone/remove/add, but until then password 
+      // We can support IE by using clone/remove/add, but until then password
       // inputs won't be ghostied.
       return (element.tagName.toLowerCase() == 'input' &&
-          ((element.type == 'text') || (element.type == 'password') && 
+          ((element.type == 'text') || (element.type == 'password') &&
           (!Prototype.Browser.IE)))
     },
     should_be_ghosted: function(element) {
@@ -64,9 +62,9 @@ var Ghostie = Class.create({
     },
     ghost: function(element) {
       if (element.should_be_ghosted()) {
-        if (element.type == 'password') { 
+        if (element.type == 'password') {
           element.addClassName('password');
-          element.type = 'text'; 
+          element.type = 'text';
         }
         element.value = element.title;
         element.addClassName('ghostied');
@@ -86,6 +84,6 @@ var Ghostie = Class.create({
 
 document.observe('dom:loaded', function(event) {
   // Perhaps I should initialize Ghostie with event.element(), and allow some
-  // degree of configuration? 
+  // degree of configuration?
   new Ghostie();
 });
